@@ -1,4 +1,4 @@
-package com.wkh.designpatterns.simplefactory;
+package com.wkh.designpatterns.simplefactory.example3;
 
 /**
  * @author wangkaihua
