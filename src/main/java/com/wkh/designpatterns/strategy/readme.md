@@ -492,6 +492,71 @@ public class Card2 implements PaymentStrategy{
 举例:
 > 在一个系统中，所有对系统的操作都要有日志记录，而且这个日志还需要有管理界面，这种情况下通常会把日志记录在数据库里面，方便后续的管理，但是在记录日志到数据库的时候，可能会发生错误，比如暂时连不上数据库了，那就先记录在文件里面，然后在合适的时候把文件中的记录再转录到数据库中。对于这样的功能，就可以采用策略模式，把日志记录到数据库和日志记录到文件当作两种记录日志的策略，然后在运行期间根据需要进行动态的切换。
 
+```
+/**
+ * 日志记录策略的接口
+ */
+public interface LogStrategy {
+	/**
+	 * 记录日志
+	 * @param msg 需记录的日志信息
+	 */
+	public void log(String msg);
+}
+
+/**
+ * 把日志记录到数据库
+ */
+public class DbLog implements LogStrategy{
+	public void log(String msg) {		
+		//制造错误
+		if(msg!=null && msg.trim().length()>5){
+			int a = 5/0;
+		}
+		System.out.println("现在把 '"+msg+"' 记录到数据库中");
+	}
+}
+
+/**
+ * 把日志记录到文件
+ */
+public class FileLog implements LogStrategy{
+	public void log(String msg) {
+		System.out.println("现在把 '"+msg+"' 记录到文件中");
+	}
+}
+
+/**
+ * 日志记录的上下文
+ */
+public class LogContext {
+	/**
+	 * 记录日志的方法，提供给客户端使用
+	 * @param msg 需记录的日志信息
+	 */
+	public void log(String msg){
+		//在上下文里面，自行实现对具体策略的选择
+		//优先选用策略：记录到数据库
+		LogStrategy strategy = new DbLog();
+		try{
+			strategy.log(msg);
+		}catch(Exception err){
+			//出错了，那就记录到文件中
+			strategy = new FileLog();
+			strategy.log(msg);
+		}
+	}	
+}
+
+public class Client {
+	public static void main(String[] args) {
+		LogContext log = new LogContext();
+		log.log("记录日志");
+		log.log("再次记录日志");
+	}
+}
+```
+
 ### 策略模式结合模板方法模式
 
 在实际应用策略模式的过程中，经常会出现一系列算法的实现上存在公共功能，甚至这一系列算法的实现步骤都是一样的，只是在某些局部步骤上有所不同。
