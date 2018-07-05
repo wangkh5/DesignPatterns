@@ -80,6 +80,112 @@ public class Client {
 
 ![image_1cf040lu32mk1lvr1ea11oe6183pm.png-68.8kB][2]   
 
+## 工厂中利用反射技术来创建对象
+```
+/**
+ * 某个接口(通用的、抽象的、非具体的功能的) 
+ */
+public interface Api {
+	/**
+	 * 某个具体的功能方法的定义，用test1来演示一下。
+	 * 这里的功能很简单，把传入的s打印输出即可 
+	 * @param s 任意想要打印输出的字符串
+	 */
+	public void test1(String s);
+}
+
+
+----------
+/**
+ * 对某个接口的一种实现 
+ */
+public class Impl implements Api{
+	
+	public void test1(String s) {
+		System.out.println("Now In Impl. The input s=="+s);
+	}
+}
+
+
+----------
+/**
+ * 对某个接口的一种实现 
+ */
+public class Impl2 implements Api{
+	
+	public void test1(String s) {
+		System.out.println("Now In Impl222222. The input s=="+s);
+	}
+}
+
+
+----------
+/**
+ * 工厂类，用来创造Api对象
+ */
+public class Factory {
+	/**
+	 * 具体的创造Api的方法，根据配置文件的参数来创建接口
+	 * @return 创造好的Api对象
+	 */
+	public static Api createApi(){
+		//直接读取配置文件来获取需要创建实例的类
+		
+		//至于如何读取Properties还有如何反射这里就不解释了
+		Properties p = new Properties(); 
+		InputStream in = null;
+		try {
+			in = Factory.class.getResourceAsStream("\\FactoryTest.properties");
+			p.load(in);
+		} catch (IOException e) {
+			System.out.println("装载工厂配置文件出错了，具体的堆栈信息如下：");
+			e.printStackTrace();
+		}finally{
+			try {
+				in.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		//用反射去创建，那些例外处理等完善的工作这里就不做了
+		Api api = null;
+		try {
+			api = (Api)Class.forName(p.getProperty("ImplClass")).newInstance();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return api;
+	}
+}
+
+
+----------
+/**
+ * 客户端：测试使用Api接口
+ */
+public class Client {
+	public static void main(String[] args) {
+		//重要改变，没有new Impl()了，取而代之Factory.createApi()
+		Api api = Factory.createApi();
+		api.test1("哈哈，不要紧张，只是个测试而已！");
+	}
+}
+
+----------
+在classes目录下新建名为FactoryTest.properties的配置文件，对要实例化的具体类进行配置：
+ImplClass=com.wkh.designpatterns.simplefactory.example2.Impl2
+
+
+----------
+
+
+运行结果：
+Now In Impl222222. The input s==哈哈，不要紧张，只是个测试而已！
+```
  
 ## 简单工厂命名的建议
 
