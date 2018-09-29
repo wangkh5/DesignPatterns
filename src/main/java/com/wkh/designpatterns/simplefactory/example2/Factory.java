@@ -16,7 +16,7 @@ public class Factory {
 		Properties p = new Properties(); 
 		InputStream in = null;
 		try {
-			in = Factory.class.getResourceAsStream("/FactoryTest.properties");
+			in = Factory.class.getResourceAsStream("\\FactoryTest.properties");
 			p.load(in);
 		} catch (IOException e) {
 			System.out.println("装载工厂配置文件出错了，具体的堆栈信息如下：");
